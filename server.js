@@ -11,7 +11,8 @@ axios.get("https://www.japantimes.co.jp/news_category/national/").then(function 
     $("article").each(function (i, element) {
         var title = $(element).find("hgroup").children("p").text();
         var link = $(element).find("hgroup").children("p").children("a").attr("href");
-        var summary = $(element).find("article").children("div.padding_block").children("p").text();
+        var summary = $(element).find("div").children("p").text().replace(/[\n\t\r]/g,"");
+        summary = summary.replace('\t', '').split('\r\n');
         results.push({
             title: title,
             link: link,
