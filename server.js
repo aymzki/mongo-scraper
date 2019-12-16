@@ -1,18 +1,22 @@
+//get those dependencies
 var axios = require("axios");
 var cheerio = require("cheerio");
 
-console.log("Grab articles from Japan Times");
+//console.log("Grab articles from Japan Times");
 
+//axios get call
 axios.get("https://www.japantimes.co.jp/news_category/national/").then(function (response) {
-    // Then, we load that into cheerio and save it to $ for a shorthand selector
+    // Load into cheerio and save it to $ for a shorthand selector
     var $ = cheerio.load(response.data);
     var results = [] ;
-    // Now, we grab every h2 within an article tag, and do the following:
+    
     $("article").each(function (i, element) {
         var title = $(element).find("hgroup").children("p").text();
         var link = $(element).find("hgroup").children("p").children("a").attr("href");
         var summary = $(element).find("div").children("p").text().replace(/[\n\t\r]/g,"");
         summary = summary.replace('\t', '').split('\r\n');
+
+        //push results
         results.push({
             title: title,
             link: link,
