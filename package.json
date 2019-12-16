@@ -1,5 +1,5 @@
 {
-    "name": "japan times mongo scraper",
+    "name": "mongoscraper",
     "version": "1.0.0",
     "description": "web app that lets users view and leave comments on the latest news scraped from another site.",
     "main": "index.js",
@@ -22,6 +22,7 @@
       "express": "^4.16.4",
       "express-handlebars": "^3.0.0",
       "mongojs": "^2.6.0",
-      "mongoose": "^5.4.13"
+      "mongoose": "^5.4.13",
+      "morgan": "^1.9.1"
     }
 }
