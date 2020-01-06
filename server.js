@@ -1,98 +1,95 @@
 //get those dependencies
+var express = require("express");
+var logger = require("morgan");
+var mongoose = require("mongoose");
+var exphbs = require("express-handlebars");
 var axios = require("axios");
 var cheerio = require("cheerio");
 
-//console.log("Grab articles from Japan Times");
+var db = require("./models");
 
-//axios get call
-axios.get("https://www.japantimes.co.jp/news_category/national/").then(function (response) {
-    // Load into cheerio and save it to $ for a shorthand selector
-    var $ = cheerio.load(response.data);
-    var results = [] ;
-    
-    $("article").each(function (i, element) {
-        var title = $(element).find("hgroup").children("p").text();
-        var link = $(element).find("hgroup").children("p").children("a").attr("href");
-        var summary = $(element).find("div").children("p").text().replace(/[\n\t\r]/g,"");
-        summary = summary.replace('\t', '').split('\r\n');
 
-        //push results
-        results.push({
-            title: title,
-            link: link,
-            summary: summary
-          });
-    });
-    console.log(results);
+// Initialize Express
+var app = express();
+var PORT = process.env.PORT || 3000;
+app.use(express.static("public"));
+
+// Set Handlebars as the default templating engine.
+app.engine("handlebars", exphbs({ defaultLayout: "main" }));
+app.set("view engine", "handlebars");
+
+// Use morgan logger for logging requests
+app.use(logger("dev"));
+// Parse request body as JSON
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+// Make public a static folder
+app.use(express.static("public"));
+
+// If deployed, use the deployed database. Otherwise use the local mongoHeadlines database
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/japantimes";
+mongoose.connect(MONGODB_URI, { useNewUrlParser: true });
+
+// Connect to the Mongo DB
+// mongoose.connect("mongodb://localhost/japantimes", { useNewUrlParser: true });
+
+
+
+console.log("Grab articles from Japan Times");
+
+//Routes
+// A GET route for scraping the Japan Times website
+app.get("/scrape", function (req, res) {
+
+    //db.Article.drop()
+    //axios get call
+    axios.get("https://www.japantimes.co.jp/news_category/national/").then(function (response) {
+        // Load into cheerio and save it to $ for a shorthand selector
+        var $ = cheerio.load(response.data);
+
+        $("article").each(function (i, element) {
+           
+            var title = $(element).find("hgroup").children("p").text();
+            var link = $(element).find("hgroup").children("p").children("a").attr("href");
+            var summary = $(element).find("div").children("p").text().replace(/[\n\t\r]/g, "");
+            summary = summary.replace('\t', '').split('\r\n');
+            
+            var result = {
+                title: title,
+                link: link,
+                summary: summary [0]
+              };
+            console.log(result);
+            //Insert the data in the japanTimes db
+            db.Article.create(result)
+                .then(function (dbArticle) {
+                    // View the added result in the console
+                    console.log(dbArticle);
+                })
+                .catch(function (err) {
+                    // If an error occurred, log it
+                    console.log(err);
+                });
+
+        });
+     res.send("Scrape Complete!"); 
+     });
 });
-//       // Create a new Article using the `result` object built from scraping
-//       db.Article.create(result)
-//         .then(function(dbArticle) {
-//           // View the added result in the console
-//           console.log(dbArticle);
-//         })
-//         .catch(function(err) {
-//           // If an error occurred, log it
-//           console.log(err);
-//         });
-//     });
 
-//     // Send a message to the client
-//     res.send("Scrape Complete");
-//   });
-// });
+app.get("/", function(req, res) {
+  // Grab every document in the Articles collection
+  db.Article.find({})
+    .then(function(dbArticle) {
+      // If we were able to successfully find Articles, send them back to the client
+      var hbsObject = {jtarticle: dbArticle};
+      res.render('index', hbsObject);
+    })
+    .catch(function(err) {
+      // If an error occurred, send it to the client
+      res.json(err);
+    });
+});
 
-// // Route for getting all Articles from the db
-// app.get("/articles", function(req, res) {
-//   // Grab every document in the Articles collection
-//   db.Article.find({})
-//     .then(function(dbArticle) {
-//       // If we were able to successfully find Articles, send them back to the client
-//       res.json(dbArticle);
-//     })
-//     .catch(function(err) {
-//       // If an error occurred, send it to the client
-//       res.json(err);
-//     });
-// });
-
-// // Route for grabbing a specific Article by id, populate it with it's note
-// app.get("/articles/:id", function(req, res) {
-//   // Using the id passed in the id parameter, prepare a query that finds the matching one in our db...
-//   db.Article.findOne({ _id: req.params.id })
-//     // ..and populate all of the notes associated with it
-//     .populate("note")
-//     .then(function(dbArticle) {
-//       // If we were able to successfully find an Article with the given id, send it back to the client
-//       res.json(dbArticle);
-//     })
-//     .catch(function(err) {
-//       // If an error occurred, send it to the client
-//       res.json(err);
-//     });
-// });
-
-// // Route for saving/updating an Article's associated Note
-// app.post("/articles/:id", function(req, res) {
-//   // Create a new note and pass the req.body to the entry
-//   db.Note.create(req.body)
-//     .then(function(dbNote) {
-//       // If a Note was created successfully, find one Article with an `_id` equal to `req.params.id`. Update the Article to be associated with the new Note
-//       // { new: true } tells the query that we want it to return the updated User -- it returns the original by default
-//       // Since our mongoose query returns a promise, we can chain another `.then` which receives the result of the query
-//       return db.Article.findOneAndUpdate({ _id: req.params.id }, { note: dbNote._id }, { new: true });
-//     })
-//     .then(function(dbArticle) {
-//       // If we were able to successfully update an Article, send it back to the client
-//       res.json(dbArticle);
-//     })
-//     .catch(function(err) {
-//       // If an error occurred, send it to the client
-//       res.json(err);
-//     });
-// });
-
-// // Start the server
-// app.listen(PORT, function() {
-//   console.log("App running on port " + PORT + "!");
-// });
+app.listen(PORT, function () {
+    console.log("App running on port 3000!");
+  });

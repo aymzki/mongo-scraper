@@ -1,28 +1,28 @@
 {
-    "name": "mongoscraper",
-    "version": "1.0.0",
-    "description": "web app that lets users view and leave comments on the latest news scraped from another site.",
-    "main": "index.js",
-    "scripts": {
-      "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "repository": {
-      "type": "git",
-      "url": "https://github.com/aymzki/mongo-scraper.git"
-    },
-    "author": "",
-    "license": "ISC",
-    "bugs": {
-      "url": "https://github.com/aymzki/mongo-scraper/issues"
-    },
-    "homepage": "https://github.com/aymzki/mongo-scraper#readme",
-    "dependencies": {
-      "axios": "^0.18.0",
-      "cheerio": "^1.0.0-rc.2",
-      "express": "^4.16.4",
-      "express-handlebars": "^3.0.0",
-      "mongojs": "^2.6.0",
-      "mongoose": "^5.4.13",
-      "morgan": "^1.9.1"
-    }
+  "name": "mongoscraper",
+  "version": "1.0.0",
+  "description": "web app that lets users view and leave comments on the latest news scraped from another site.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aymzki/mongo-scraper.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aymzki/mongo-scraper/issues"
+  },
+  "homepage": "https://github.com/aymzki/mongo-scraper#readme",
+  "dependencies": {
+    "axios": "^0.18.1",
+    "cheerio": "^1.0.0-rc.3",
+    "express": "^4.17.1",
+    "express-handlebars": "^3.0.0",
+    "mongojs": "^2.6.0",
+    "mongoose": "^5.8.3",
+    "morgan": "^1.9.1"
+  }
 }

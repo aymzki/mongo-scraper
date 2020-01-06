@@ -29,5 +29,5 @@ note: {
 
 ArticleSchema.index({title: "text"});
 
-var Article  = mongoose.model("Article", Articleschema);
+var Article  = mongoose.model("Article", ArticleSchema);
 module.exports = Article;
